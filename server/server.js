@@ -16,6 +16,7 @@ const server = new ApolloServer({
 const startApolloServer = async () => {
   await server.start();
 
+  app.use("/graphql", expressMiddleware(server));
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
@@ -31,7 +32,6 @@ const startApolloServer = async () => {
   }
 
   // Important for MERN Setup: Any client-side requests that begin with '/graphql' will be handled by our Apollo Server
-  app.use("/graphql", expressMiddleware(server));
 
   db.once("open", () => {
     app.listen(PORT, () => {
