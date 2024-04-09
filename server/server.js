@@ -7,7 +7,7 @@ const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -16,9 +16,9 @@ const server = new ApolloServer({
 const startApolloServer = async () => {
   await server.start();
 
-  app.use("/graphql", expressMiddleware(server));
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
+  app.use("/graphql", expressMiddleware(server));
 
   // Important for MERN Setup: When our application runs from production, it functions slightly differently than in development
   // In development, we run two servers concurrently that work together

@@ -1,4 +1,5 @@
 const { User } = require("../models");
+const { AuthenticationError } = require("apollo-server-errors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -40,19 +41,20 @@ const resolvers = {
       const token = jwt.sign({ email, _id: user._id }, secret, {
         expiresIn: expiration,
       });
-
       return { token, user };
     },
 
-    saveBook: async (_, { bookData }, context) => {
-      if (context.user) {
-        return User.findByIdAndUpdate(
-          context.user._id,
-          { $addToSet: { savedBooks: bookData } },
-          { new: true, runValidators: true }
-        );
+    saveBook: async (_, { book }, context) => {
+      if (!context.user) {
+        // throw new AuthenticationError("Not logged in!");
+        console.log();
       }
-      throw new Error("Not logged in!");
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        { $addToSet: { savedBooks: book } },
+        { new: true, runValidators: true }
+      );
+      return updatedUser;
     },
 
     removeBook: async (_, { bookId }, context) => {
